@@ -5,7 +5,7 @@ pipeline {
             steps {
                 script {
                     withEnv(['JIRA_SITE=LOCAL']) {
-                        def csvFilePath = '/var/jenkins_home/workspace/sample.csv'
+                        def csvFilePath = '/var/jenkins_home/workspace/JiraTest/sample.csv'
                         def csvData = readFile csvFilePath
                         def lines = csvData.readLines()
                         
