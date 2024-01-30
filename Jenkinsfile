@@ -15,21 +15,14 @@ pipeline {
                             lines.drop(1).eachWithIndex { line, lineNum ->
                                 def columns = line.split(',')
                                 def issueType = columns[3].trim()
-
+                                
                                 if (issueType == 'エピック') {
                                     def epicIssue = createJiraIssue(columns, issueType)
                                     def response = jiraNewIssue issue: epicIssue
-
-                                    echo "Epic Creation Status: ${response.successful}"
-                                    echo "Epic Key: ${response.data.key}"
-
                                     epicKey = response.data.key
                                 } else if (issueType == 'タスク') {
                                     def taskIssue = createJiraIssue(columns, issueType, epicKey)
                                     def response = jiraNewIssue issue: taskIssue
-
-                                    echo "Task Creation Status: ${response.successful}"
-                                    echo "Task Key: ${response.data.key}"
                                 }
                             }
                         } else {
@@ -53,8 +46,10 @@ def createJiraIssue(columns, issueType, parentKey = '') {
         description: description,
         issuetype: [name: issueType]
     ]
+    
     if (issueType == 'タスク') {
         issueFields.parent = [key: parentKey]
     }
+    
     return [fields: issueFields]
 }
