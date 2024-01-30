@@ -10,18 +10,35 @@ pipeline {
                         def lines = csvData.readLines()
                         
                         if (lines.size() > 1) {
+                            def epicKey = ''
                             lines.drop(1).eachWithIndex { line, lineNum ->
-                            echo line
-                            def columns = line.split(',')
-                            def jiraIssue = [fields: [
-                                project: [key: columns[0]],
-                                summary: columns[1],
-                                description: columns[2],
-                                issuetype: [name: columns[3]]
-                            ]]
-                            response = jiraNewIssue issue: jiraIssue    
-                            echo response.successful.toString()
-                            echo response.data.toString()
+                                def columns = line.split(',')
+                                if (issueType == 'エピック') {
+                                    def epicIssue = [fields: [
+                                        project: [key: columns[0].trim()],
+                                        summary: columns[1].trim(),
+                                        description: columns[2].trim(),
+                                        issuetype: [name: columns[3].trim()]
+                                    ]]
+                                    response = jiraNewIssue issue: epicIssue    
+                                    echo response.successful.toString()
+                                    echo response.data.toString()
+                                    
+                                    // Call JIRA REST API to create Epic
+                                    epicKey = response.data.key                                
+                                } else if (issueType == 'タスク') {
+                                    def columns = line.split(',')
+                                    def taskIssue = [fields: [
+                                        project: [key: columns[0].trim()],
+                                        summary: columns[1].trim(),
+                                        description: columns[2].trim(),
+                                        issuetype: [name: columns[3].trim()],
+                                        parent: [key: epicKey]
+                                    ]]
+                                    response = jiraNewIssue issue: taskIssue    
+                                    echo response.successful.toString()
+                                    echo response.data.toString()
+                                }
                             }
                         } else {
                             echo "CSV file has less than 2 lines."
