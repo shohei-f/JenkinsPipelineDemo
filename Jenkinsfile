@@ -1,43 +1,35 @@
 pipeline {
     agent any
+
     stages {
-        stage('jira') {
+        stage('Jira') {
             steps {
                 script {
                     withEnv(['JIRA_SITE=LOCAL']) {
                         def csvFilePath = '/var/jenkins_home/workspace/JiraTest/sample.csv'
                         def csvData = readFile csvFilePath
                         def lines = csvData.readLines()
-                        
+
                         if (lines.size() > 1) {
                             def epicKey = ''
                             lines.drop(1).eachWithIndex { line, lineNum ->
                                 def columns = line.split(',')
                                 def issueType = columns[3].trim()
+
                                 if (issueType == 'エピック') {
-                                    def epicIssue = [fields: [
-                                        project: [key: columns[0].trim()],
-                                        summary: columns[1].trim(),
-                                        description: columns[2].trim(),
-                                        issuetype: [name: issueType]
-                                    ]]
-                                    response = jiraNewIssue issue: epicIssue    
-                                    echo response.successful.toString()
-                                    echo response.data.toString()
-                                    
-                                    // Call JIRA REST API to create Epic
-                                    epicKey = response.data.key                                
+                                    def epicIssue = createJiraIssue(columns, issueType)
+                                    def response = jiraNewIssue issue: epicIssue
+
+                                    echo "Epic Creation Status: ${response.successful}"
+                                    echo "Epic Key: ${response.data.key}"
+
+                                    epicKey = response.data.key
                                 } else if (issueType == 'タスク') {
-                                    def taskIssue = [fields: [
-                                        project: [key: columns[0].trim()],
-                                        summary: columns[1].trim(),
-                                        description: columns[2].trim(),
-                                        issuetype: [name: issueType],
-                                        parent: [key: epicKey]
-                                    ]]
-                                    response = jiraNewIssue issue: taskIssue    
-                                    echo response.successful.toString()
-                                    echo response.data.toString()
+                                    def taskIssue = createJiraIssue(columns, issueType, epicKey)
+                                    def response = jiraNewIssue issue: taskIssue
+
+                                    echo "Task Creation Status: ${response.successful}"
+                                    echo "Task Key: ${response.data.key}"
                                 }
                             }
                         } else {
@@ -48,4 +40,21 @@ pipeline {
             }
         }
     }
+}
+
+def createJiraIssue(columns, issueType, parentKey = '') {
+    def projectKey = columns[0].trim()
+    def summary = columns[1].trim()
+    def description = columns[2].trim()
+
+    def issueFields = [
+        project: [key: projectKey],
+        summary: summary,
+        description: description,
+        issuetype: [name: issueType]
+    ]
+    if (issueType == 'タスク') {
+        issueFields.parent = [key: parentKey]
+    }
+    return [fields: issueFields]
 }
