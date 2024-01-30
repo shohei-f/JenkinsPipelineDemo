@@ -1,5 +1,8 @@
 project,summary,description,issuetype
+SAMPLE,寿司の作り方,description,エピック
+SAMPLE,魚の仕立て,description,タスク
+SAMPLE,酢飯用意,description,タスク
+SAMPLE,握る,description,タスク
 SAMPLE,おでんの作り方,description,エピック
 SAMPLE,材料用意,description,タスク
 SAMPLE,鍋に投入,description,タスク
-SAMPLE,煮る,description,タスク
