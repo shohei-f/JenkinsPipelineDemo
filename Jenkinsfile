@@ -27,7 +27,6 @@ pipeline {
                                     // Call JIRA REST API to create Epic
                                     epicKey = response.data.key                                
                                 } else if (issueType == 'タスク') {
-                                    def columns = line.split(',')
                                     def taskIssue = [fields: [
                                         project: [key: columns[0].trim()],
                                         summary: columns[1].trim(),
