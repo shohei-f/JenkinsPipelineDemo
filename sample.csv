@@ -1,5 +1,5 @@
 project,summary,description,issuetype
-SAMPLE,[Sample]ううううううう5,description,エピック
-SAMPLE,[Sample]あああ6,description,エピック
-SAMPLE,[Sample]うううう7,description,エピック
-SAMPLE,[Sample]えええ8,description,エピック
+SAMPLE,おでんの作り方,description,エピック
+SAMPLE,材料用意,description,タスク
+SAMPLE,鍋に投入,description,タスク
+SAMPLE,煮る,description,タスク
