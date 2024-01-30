@@ -13,12 +13,13 @@ pipeline {
                             def epicKey = ''
                             lines.drop(1).eachWithIndex { line, lineNum ->
                                 def columns = line.split(',')
+                                def issuetype = columns[3].trim()
                                 if (issueType == 'エピック') {
                                     def epicIssue = [fields: [
                                         project: [key: columns[0].trim()],
                                         summary: columns[1].trim(),
                                         description: columns[2].trim(),
-                                        issuetype: [name: columns[3].trim()]
+                                        issuetype: [name: issuetype]
                                     ]]
                                     response = jiraNewIssue issue: epicIssue    
                                     echo response.successful.toString()
@@ -31,7 +32,7 @@ pipeline {
                                         project: [key: columns[0].trim()],
                                         summary: columns[1].trim(),
                                         description: columns[2].trim(),
-                                        issuetype: [name: columns[3].trim()],
+                                        issuetype: [name: issuetype],
                                         parent: [key: epicKey]
                                     ]]
                                     response = jiraNewIssue issue: taskIssue    
